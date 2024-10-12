@@ -21,7 +21,7 @@ def procesar_problema(problema):
     tipo_variables = []
 
     # Separar líneas del problema
-    lineas = problema.strip().split("\n")
+    lineas = problema
 
     # Procesar la función de coste
     coef_coste = re.findall(r"([-+]?\d*\.?\d*)x\d+",lineas[0].replace("−", "-").replace(" ", ""))
@@ -97,9 +97,8 @@ def procesar_problema(problema):
         "funcion_coste": funcion_coste
     }
 
-
-
-
+#Algunos casos de test:
+# 3 variables
 """
 max x1−x2+x3
 s.a: x1 + 2x2 − x3≤3
@@ -109,20 +108,31 @@ x1 ≥ 0
 x2 ≤ 0
 x3 libre
 """
-
+#2 variables infactibles
 """
-max x1−x2
+max x1-x2
 s.a: x1 + 2x2 ≤3
 x1 − x2  ≤ −2
-x1 + 3x2 <= 10
+x1 + 3x2 >= 10
 x1 ≥ 0
 x2 >= 0
 """
+#2 varibales factibles
+"""
+max x1 - x2
+s.a: 8x1 - 6x2 <= 10
+8x1 + x2 <= 20
+x1 >= 0
+x2 >= 0
+"""
 
-print("Ingrese el problema y presiona Ctrl+D (o Ctrl+Z en Windows) para terminar: ")
+print("Ingrese el problema e ingrese -1 cuando termine el problema: ")
 
-problema = sys.stdin.read()
-
+problema = []
+entrada = input()
+while entrada != "-1":
+    problema.append(entrada)
+    entrada = input()
 
 print("Problema original:")
 print(problema)
@@ -146,10 +156,15 @@ for _, key in enumerate(resultado):
     print(f"{key}")
     print(f"{resultado[key]}")
 
-if len(resultado["tipo_variables"]) == 2:
-    graficar_region_factible_2d(resultado["restricciones"], resultado["tipo_restriccion"],
-                                resultado["rhs"], resultado["tipo_variables"],
-                                resultado["funcion_coste"])
+
+if len(resultado['tipo_variables']) == 2:
+    grafico = input("Deseas graficar Yes/No")
+    if grafico in ["Y","y","Yes","yes"]:
+        try:
+            graficar_region_factible_2d(resultado["restricciones"], resultado["tipo_restriccion"], resultado["rhs"], resultado["tipo_variables"],resultado["funcion_coste"])
+        except:
+            print("no se puede graficar")
+
 
 print("-----------------------------------------------------------------------")
 
