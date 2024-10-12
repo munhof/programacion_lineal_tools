@@ -33,7 +33,8 @@ def graficar_region_factible_2d(restricciones, tipo_restriccion, rhs, tipo_varia
     
     for i in range(len(tipo_restriccion)):
         x = np.linspace(-10,10,100)
-        plt.plot(x, (rhs[i] - restricciones[i][0] * x) / restricciones[i][1])
+        plt.plot(x, (rhs[i] - restricciones[i][0] * x) / restricciones[i][1],
+                 label=f'{restricciones[i][0]}*x1 + {restricciones[i][1]}x2 {tipo_restriccion[i]} {rhs[i]}')
         
 
 
@@ -52,7 +53,7 @@ def graficar_region_factible_2d(restricciones, tipo_restriccion, rhs, tipo_varia
     plt.plot(2*x1,0*x1,"--k")
     plt.plot(0*x2,2*x2,"--k")
 
-    
+    plt.legend()
     plt.grid()
     plt.show()
 
