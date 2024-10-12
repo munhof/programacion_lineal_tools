@@ -1,7 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.patches import Polygon
-from matplotlib.widgets import Slider
+
 
 def ordenar_vertices(vertices):
     """ Ordena los vértices en sentido antihorario respecto al centroide. """
@@ -32,9 +32,9 @@ def graficar_region_factible_2d(restricciones, tipo_restriccion, rhs, tipo_varia
         # Sombrear la región factible para la restricción actual
         if restricciones[i][1] != 0:
             if restricciones[i][1] < 0:
-                plt.fill_between(x, y, max(x), where=(y <= max(x)), alpha=0.5)
+                plt.fill_between(x, y, max(x), where= y <= max(x), alpha=0.5)
             else:
-                plt.fill_between(x, y, min(x), where=(y >= min(x)), alpha=0.5)
+                plt.fill_between(x, y, min(x), where= y >= min(x), alpha=0.5)
 
     # Sombrear las regiones válidas para las variables (x1 y x2)
     if 'no_neg' in tipo_variables:
@@ -146,7 +146,7 @@ def graficar_region_factible_2d(restricciones, tipo_restriccion, rhs, tipo_varia
         # Asignar color basado en el valor de t
         color = plt.cm.viridis((t - min(t_values)) / (max(t_values) - min(t_values)))  # Gradiente de color
         plt.plot(x1, x2, linestyle='--', color=color, alpha=0.6)  # Dibujar la curva de nivel
-
+    plt.colorbar(plt.cm.ScalarMappable(cmap='viridis') ,label='Escala de Curvas de Nivel', orientation='horizontal')
     # Personalizar el gráfico
 
     plt.xlim(min(x) + 0.1 * min(x), max(x) + 0.1 * max(x))
@@ -161,12 +161,11 @@ def graficar_region_factible_2d(restricciones, tipo_restriccion, rhs, tipo_varia
     # Leyenda fuera del gráfico
     handles, labels = plt.gca().get_legend_handles_labels()
     by_label = dict(zip(labels, handles))
-    legend = plt.legend(by_label.values(), by_label.keys(), title='Referencias',
-                        )
+    plt.legend(by_label.values(), by_label.keys(), title='Referencias')
 
     # Agregar escala de curvas de nivel
-    plt.colorbar(plt.cm.ScalarMappable(cmap='viridis'), label='Escala de Curvas de Nivel', orientation='horizontal')
 
+    plt.savefig('region_factible.png')
     plt.show()
 
 

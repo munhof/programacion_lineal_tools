@@ -158,12 +158,9 @@ for _, key in enumerate(resultado):
 
 
 if len(resultado['tipo_variables']) == 2:
-    grafico = input("Deseas graficar Yes/No")
-    if grafico in ["Y","y","Yes","yes"]:
-        try:
-            graficar_region_factible_2d(resultado["restricciones"], resultado["tipo_restriccion"], resultado["rhs"], resultado["tipo_variables"],resultado["funcion_coste"])
-        except:
-            print("no se puede graficar")
+    orden = input("Deseas graficar [Yes]/No")
+    if orden in ["Y","y","Yes","yes"] or orden == "":
+        graficar_region_factible_2d(resultado["restricciones"], resultado["tipo_restriccion"], resultado["rhs"], resultado["tipo_variables"],resultado["funcion_coste"])
 
 
 print("-----------------------------------------------------------------------")
