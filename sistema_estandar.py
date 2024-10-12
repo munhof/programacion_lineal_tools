@@ -6,8 +6,9 @@ Created on %(date)s
 """
 import numpy as np
 import re
-from convertir_a_diccionario import convertir_forma_estandar, mostrar_formato_estandar
-from graficar_region_factible import graficar_region_factible
+from convertir_a_diccionario import convertir_forma_estandar
+from convertir_a_diccionario import mostrar_formato_estandar
+from graficar_region_factible import graficar_region_factible_2d
 import sys
 
 
@@ -23,8 +24,7 @@ def procesar_problema(problema):
     lineas = problema.strip().split("\n")
 
     # Procesar la función de coste
-    coef_coste = re.findall(r"([-+]?\d*\.?\d*)x\d+",
-                            lineas[0].replace("−", "-").replace(" ", ""))
+    coef_coste = re.findall(r"([-+]?\d*\.?\d*)x\d+",lineas[0].replace("−", "-").replace(" ", ""))
     for coef in coef_coste:
         if coef == "-" or coef == "+" or coef == "":
             funcion_coste.append(float(coef + "1"))
@@ -47,8 +47,7 @@ def procesar_problema(problema):
             restriccion = re.findall(r"([-+]?\d*\.?\d*)x\d+", linea)
 
             # Extraer el valor de rhs
-            rhs_valor = float(re.findall(
-                r"(?<=[≤≥=<>])\s*([-+]?\d+\.?\d*)", linea)[0])
+            rhs_valor = float(re.findall(r"(?<=[≤≥=<>])\s*([-+]?\d+\.?\d*)", linea)[0])
 
             # Agregar la restricción a la lista
             coeficientes_restriccion = []
@@ -66,8 +65,7 @@ def procesar_problema(problema):
             elif "≥" in linea or ">=" in linea:
                 tipo_restriccion.append(">=")
                 # Invertir los coeficientes y rhs para mantener la restricción como <=
-                coeficientes_restriccion = [
-                    -c for c in coeficientes_restriccion]
+                coeficientes_restriccion = [-c for c in coeficientes_restriccion]
                 rhs_valor = -rhs_valor  # Invertir el valor de rhs
             elif "=" in linea:
                 tipo_restriccion.append("=")
@@ -77,15 +75,14 @@ def procesar_problema(problema):
 
     # Procesar variables con restricciones sobre las variables
     for linea in lineas[len(lineas) - rango:]:
-        if "≥" in linea or "≤" in linea or "libre" in linea:
-            for j in range(len(linea)):
-                if f"x{j + 1}" in linea:
-                    if "≥" in linea:
-                        tipo_variables.append("no_neg")
-                    if "≤" in linea:
-                        tipo_variables.append("negativa")
-                    if "libre" in linea:
-                        tipo_variables.append("libre")
+        for j in range(len(linea)):
+            if f"x{j + 1}" in linea:
+                if "≥" in linea or ">=" in linea:
+                    tipo_variables.append("no_neg")
+                if "≤" in linea or "<=" in linea:
+                    tipo_variables.append("negativa")
+                if "libre" in linea:
+                    tipo_variables.append("libre")
 
     # Alinear las restricciones
     restricciones_extendidas = [
@@ -123,6 +120,7 @@ x2 >= 0
 """
 
 print("Ingrese el problema y presiona Ctrl+D (o Ctrl+Z en Windows) para terminar: ")
+
 problema = sys.stdin.read()
 
 
@@ -142,21 +140,22 @@ print(problema[0:3], " ", expresion)
 print("s.a")
 for i, fila in enumerate(resultado["restricciones"]):
     fila_str = " ".join(f"{coef}" for j, coef in enumerate(fila))
-    print(f"[{fila_str}] [x{i+1}] {resultado['tipo_restriccion'][i]} [{resultado['rhs'][i]}]")
+    print(f"[{fila_str}] {'[x'+str(i+1)+']' if i <= len(resultado['tipo_variables']) else ''}  {resultado['tipo_restriccion'][i]} [{resultado['rhs'][i]}]")
 
 for _, key in enumerate(resultado):
     print(f"{key}")
     print(f"{resultado[key]}")
 
-#si desea graficar descomente
-#graficar_region_factible(resultado["restricciones"], resultado["rhs"],
-#                         resultado["tipo_variables"], resultado["tipo_restriccion"],
-#                         resultado["funcion_coste"])
+if len(resultado["tipo_variables"]) == 2:
+    graficar_region_factible_2d(resultado["restricciones"], resultado["tipo_restriccion"],
+                                resultado["rhs"], resultado["tipo_variables"],
+                                resultado["funcion_coste"])
 
 print("-----------------------------------------------------------------------")
 
 sistema_estandar, rhs_estandar, nuevas_vars, coste_modificado = convertir_forma_estandar(
     resultado["restricciones"], resultado["tipo_restriccion"], resultado["rhs"], resultado["tipo_variables"],
     resultado["funcion_coste"])
+
 
 mostrar_formato_estandar(sistema_estandar, rhs_estandar, coste_modificado)

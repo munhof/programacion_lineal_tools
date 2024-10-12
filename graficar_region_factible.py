@@ -1,63 +1,66 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-def graficar_region_factible(restricciones, rhs, tipo_variables, tipo_restriccion, funcion_coste):
-    # Número de variables (columnas de restricciones)
-    rango = np.linalg.matrix_rank(restricciones)
+def graficar_region_factible_2d(restricciones, tipo_restriccion, rhs, tipo_variables, funcion_coste):
+    """
+    es importante notar que todas las restricciones son del tipo <= o =
+    :param restricciones:
+    :param tipo_restriccion:
+    :param rhs:
+    :param tipo_variables: no_neg, neg, libre
+    :param funcion_coste:
+    :return:
+    """
 
-    def plot_region_2d(restricciones, rhs, tipo_variables, tipo_restriccion):
-        # Definir el rango de valores de las variables
-        x1_vals = np.linspace(-10, 10, 400)
-        x2_vals = np.linspace(-10, 10, 400)
-        X1, X2 = np.meshgrid(x1_vals, x2_vals)
+    x1 = []
+    x2 = []
 
-        # Crear una matriz de booleanos para identificar la región factible
-        region_factible = np.ones(X1.shape, dtype=bool)
+    if tipo_variables[0] == "no_neg":
+        x1 = np.linspace(0, 10,100)
+    elif tipo_variables[0] == "neg":
+        x1 = np.linspace(-10, 0,100)
+    else:
+        x1 = np.linspace(-10, 10,100)
 
-        # Verificar cada restricción y aplicar sobre la malla
-        for i in range(rango):
-            a, b = restricciones[i]
-            c = rhs[i]
+    if tipo_variables[1] == "no_neg":
+        x2 = np.linspace(0,10,100)
+    elif tipo_variables[1] == "neg":
+        x2 = np.linspace(-10,0,100)
+    else:
+        x2 = np.linspace(-10,10,100)
 
-            if tipo_restriccion[i] == "<=":
-                region_factible &= (a * X1 + b * X2 <= c)
-            else:  # Asumimos que es de tipo "="
-                region_factible &= (a * X1 + b * X2 == c)
+    region = np.zeros([len(x1),len(x2)])
+    
+    for i in range(len(tipo_restriccion)):
+        x = np.linspace(-10,10,100)
+        plt.plot(x, (rhs[i] - restricciones[i][0] * x) / restricciones[i][1])
+        
 
-        # Procesar el tipo de variables (positivas, negativas, libres)
-        if tipo_variables[0] == 'no_neg':  # x1 >= 0
-            region_factible &= (X1 >= 0)
-        if tipo_variables[-1] == 'no_neg':  # x2 >= 0
-            region_factible &= (X2 >= 0)
 
-        # Graficar la región factible
-        fig, ax = plt.subplots()
-        ax.contourf(X1, X2, region_factible, levels=[0, 1], colors=['green'], alpha=0.3)
+    for x in x1:
+        for y in x2:
+            pinto = True
+            for i in range(len(tipo_restriccion)):
+                if tipo_restriccion[i] == "<=":
+                    pinto &= (restricciones[i][0] * x + restricciones[i][1] * y <= rhs[i])
+                elif tipo_restriccion[i] == "=":
+                    pinto &= (restricciones[i][0] * x + restricciones[i][1] * y == rhs[i])
+            if pinto:
+                plt.plot(x,y,".b")
 
-        # Graficar las líneas de las restricciones
-        for i in range(rango):
-            a, b = restricciones[i]
-            c = rhs[i]
 
-            if b != 0:
-                # Resolver para x2
-                x2_line = (c - a * x1_vals) / b
-                ax.plot(x1_vals, x2_line, label=f'Restricción {i + 1}: {a}x1 + {b}x2 {tipo_restriccion[i]} {c}')
-            else:
-                ax.axvline(x=c / a, color='red', label=f'Restricción {i + 1}: {a}x1 {tipo_restriccion[i]} {c}')
+    plt.plot(2*x1,0*x1,"--k")
+    plt.plot(0*x2,2*x2,"--k")
 
-        ax.set_xlim([-10, 10])
-        ax.set_ylim([-10, 10])
-        ax.set_xlabel('x1')
-        ax.set_ylabel('x2')
-        ax.legend()
-        ax.grid(True)
-        plt.title('Región factible en 2D')
-        plt.show()
+    
+    plt.grid()
+    plt.show()
 
-    if rango == 2:
-        plot_region_2d(restricciones, rhs, tipo_variables, tipo_restriccion)
-        print("plot 2d")
-    if rango == 3:
-        print("no disponible aun")
-        print("plot 3d")
+"""
+restricciones = np.array([[ 1.,  -5.], [ 8., 9.]])
+rhs = np.array([ 10., 5.])
+tipo_restriccion = ['<=', '<=']
+tipo_variables = ['no_neg', 'no_neg']
+funcion_coste = np.array([-1.,  1.])
+
+graficar_region_factible_2d(restricciones, tipo_restriccion, rhs, tipo_variables, funcion_coste)"""
