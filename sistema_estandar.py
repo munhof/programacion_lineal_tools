@@ -32,9 +32,11 @@ def procesar_problema(problema):
             funcion_coste.append(float(coef))
 
     funcion_coste = np.array(funcion_coste)
+
+
     rango = len(funcion_coste)
 
-    if lineas[0].startswith("max"):
+    if lineas[0].startswith("min"):
         funcion_coste = -1 * funcion_coste
 
     # Procesar las restricciones
