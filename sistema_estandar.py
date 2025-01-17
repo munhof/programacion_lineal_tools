@@ -121,11 +121,13 @@ x2 >= 0
 """
 #2 varibales factibles
 """
-max x1 - x2
-s.a: 8x1 - 6x2 <= 10
-8x1 + x2 <= 20
+max 13x1 + 16x2 + 11x3
+8x1 + 16x2 + 12x3 <= 240
+4x1 + 8x2 + 10x3 >= 90
+7x1 + 9x2 + 8x3 = 110
 x1 >= 0
 x2 >= 0
+x3 >= 0
 """
 
 print("Ingrese el problema e ingrese -1 cuando termine el problema: ")
